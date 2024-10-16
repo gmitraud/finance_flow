@@ -16,13 +16,6 @@ const FinanceList = () => {
   const [updatedValue, setUpdatedValue] = useState('');
   const [updatedDate, setUpdatedDate] = useState('');
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(amount);
-  };
-
   const handleChange = (e) => {
     setNewInvestment({ ...newInvestment, [e.target.name]: e.target.value });
   };
@@ -30,7 +23,7 @@ const FinanceList = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const id = investments.length + 1; // Gera um ID simples
-    setInvestments([...investments, { ...newInvestment, id, updatedAmount: null, amount: formatCurrency(newInvestment.amount) }]);
+    setInvestments([...investments, { ...newInvestment, id, updatedAmount: null, amount: newInvestment.amount }]);
     setNewInvestment({ name: '', amount: '', date: '' }); // Reseta o formulário
     setShowForm(false); // Fecha o formulário
   };
@@ -48,7 +41,7 @@ const FinanceList = () => {
   const handleUpdate = (id) => {
     const updatedInvestments = investments.map((investment) => {
       if (investment.id === id) {
-        return { ...investment, updatedAmount: formatCurrency(updatedValue), date: updatedDate };
+        return { ...investment, updatedAmount: updatedValue, date: updatedDate };
       }
       return investment;
     });
@@ -98,7 +91,7 @@ const FinanceList = () => {
         {investments.map((investment) => (
           <FinanceItem
             key={investment.id}
-            investment={{ ...investment, onDelete: handleDelete, onReview: handleReview, formatCurrency }}
+            investment={{ ...investment, onDelete: handleDelete, onReview: handleReview }}
           />
         ))}
       </ul>

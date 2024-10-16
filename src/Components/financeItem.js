@@ -2,13 +2,20 @@
 
 import React from 'react';
 
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(amount);
+};
+
 const FinanceItem = ({ investment }) => {
   return (
     <li>
       <strong>{investment.name}</strong> - 
-      Original Value: R${investment.amount} 
+      Original Value: {formatCurrency(investment.amount)} 
       {investment.updatedAmount && (
-        <> (Updated Value: <strong>{investment.updatedAmount}</strong>) </>
+        <> (Updated Value: <strong>{formatCurrency(investment.updatedAmount)}</strong>) </>
       )} 
       on {investment.date}
       <button onClick={() => investment.onDelete(investment.id)}>Delete</button>

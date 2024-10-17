@@ -27,19 +27,21 @@ const FinanceList = () => {
   const handleUpdateInvestment = (id, newHistory) => {
     const updatedInvestments = investments.map((investment) => {
       if (investment.id === id) {
-        const finalValue = newHistory.length > 0
-          ? newHistory[newHistory.length - 1].value
-          : investment.amount;
-
+        const lastEntry = newHistory.length > 0
+          ? newHistory[newHistory.length - 1] // Obter o último valor e a data
+          : { value: investment.amount, date: investment.date }; // Se não houver histórico, usa o valor original
+  
         return {
           ...investment,
           history: newHistory,
-          finalValue: finalValue,
+          finalValue: lastEntry.value,
+          lastUpdateDate: lastEntry.date,
         };
       }
       return investment;
     });
     setInvestments(updatedInvestments);
+  
     const updatedInvestment = updatedInvestments.find((inv) => inv.id === id);
     setSelectedInvestment(updatedInvestment);
   };
@@ -57,6 +59,8 @@ const FinanceList = () => {
       amount: parseFloat(newInvestment.amount),
       date: newInvestment.date,
       history: [],
+      finalValue: parseFloat(newInvestment.amount),
+      lastUpdateDate: newInvestment.date,
     };
   
     setInvestments([...investments, newInvestmentData]);

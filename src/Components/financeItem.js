@@ -4,17 +4,18 @@ import formatDate from './formatDate';
 import '../App.css';
 
 const FinanceItem = ({ investment }) => {
-  const latestValue = investment.finalValue || investment.amount;
+  const { id, name, finalValue, lastUpdateDate, onDelete, onReview } = investment;
 
   return (
-    <li className="finance-item">
-      <strong>{investment.name}</strong> - 
-      Latest Value: <strong>{formatCurrency(latestValue)}</strong>
-      &nbsp;on {formatDate(investment.date)}
+    <li>
       <div>
-        <button onClick={() => investment.onDelete(investment.id)}>Delete</button>
-        <button onClick={() => investment.onReview(investment.id)}>Review</button>
+        <h3>{name}</h3>
+        <p>
+          Latest Value: {formatCurrency(finalValue)} on {formatDate(lastUpdateDate)}
+        </p>
       </div>
+      <button onClick={() => onReview(id)}>Review</button>
+      <button onClick={() => onDelete(id)}>Delete</button>
     </li>
   );
 };

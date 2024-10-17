@@ -1,32 +1,13 @@
-// src/Components/financeList.js
-
 import React, { useState } from 'react';
-import FinanceItem from './financeItem.js';
+import FinanceItem from './financeItem';
+import InvestmentDetails from './InvestmentDetails';
 
 const FinanceList = () => {
-  const [investments, setInvestments] = useState([
-    { id: 1, name: 'Investment A', amount: 1000, date: '2023-01-15' },
-    { id: 2, name: 'Investment B', amount: 2000, date: '2023-02-10' },
-    { id: 3, name: 'Investment C', amount: 1500, date: '2023-03-22' },
-  ]);
+  const [investments, setInvestments] = useState([]);
 
-  const [showForm, setShowForm] = useState(false);
+  const [selectedInvestment, setSelectedInvestment] = useState(null);
   const [newInvestment, setNewInvestment] = useState({ name: '', amount: '', date: '' });
-  const [reviewId, setReviewId] = useState(null);
-  const [updatedValue, setUpdatedValue] = useState('');
-  const [updatedDate, setUpdatedDate] = useState('');
-
-  const handleChange = (e) => {
-    setNewInvestment({ ...newInvestment, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const id = investments.length + 1; // Gera um ID simples
-    setInvestments([...investments, { ...newInvestment, id, updatedAmount: null, amount: newInvestment.amount }]);
-    setNewInvestment({ name: '', amount: '', date: '' }); // Reseta o formulário
-    setShowForm(false); // Fecha o formulário
-  };
+  const [showAddInvestment, setShowAddInvestment] = useState(false);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this investment?')) {
@@ -35,56 +16,75 @@ const FinanceList = () => {
   };
 
   const handleReview = (id) => {
-    setReviewId(id);
+    const investment = investments.find((inv) => inv.id === id);
+    setSelectedInvestment(investment);
   };
 
-  const handleUpdate = (id) => {
+  const handleCloseDetails = () => {
+    setSelectedInvestment(null);
+  };
+
+  const handleUpdateInvestment = (id, newHistory) => {
     const updatedInvestments = investments.map((investment) => {
       if (investment.id === id) {
-        return { ...investment, updatedAmount: updatedValue, date: updatedDate };
+        const finalValue = newHistory.length > 0
+          ? newHistory[newHistory.length - 1].value
+          : investment.amount;
+
+        return {
+          ...investment,
+          history: newHistory,
+          finalValue: finalValue,
+        };
       }
       return investment;
     });
     setInvestments(updatedInvestments);
-    setReviewId(null); // Fecha a revisão
-    setUpdatedValue(''); // Reseta o valor
-    setUpdatedDate(''); // Reseta a data
+    const updatedInvestment = updatedInvestments.find((inv) => inv.id === id);
+    setSelectedInvestment(updatedInvestment);
+  };
+
+  const handleAddInvestment = (newInvestment) => {
+    if (!newInvestment.name || !newInvestment.amount || !newInvestment.date) {
+      alert('Please fill all fields');
+      return;
+    }
+  
+    const id = investments.length ? investments[investments.length - 1].id + 1 : 1;
+    const newInvestmentData = {
+      id,
+      name: newInvestment.name,
+      amount: parseFloat(newInvestment.amount),
+      date: newInvestment.date,
+      history: [],
+    };
+  
+    setInvestments([...investments, newInvestmentData]);
+    setNewInvestment({ name: '', amount: '', date: '' });
+    setShowAddInvestment(false);
+  };
+
+  const handleOpenAddInvestment = () => {
+    setShowAddInvestment(true);
+    setNewInvestment({ name: '', amount: '', date: '' });
+  };
+
+  const handleCloseAddInvestment = () => {
+    setShowAddInvestment(false);
   };
 
   return (
     <div>
       <h2>My Investments</h2>
-      <button onClick={() => setShowForm(!showForm)}>
-        {showForm ? 'Cancel' : 'Add Investment'}
-      </button>
+      
+      <button onClick={handleOpenAddInvestment}>Add Investment</button>
 
-      {showForm && (
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            value={newInvestment.name}
-            onChange={handleChange}
-            placeholder="Investment Name"
-            required
-          />
-          <input
-            type="number"
-            name="amount"
-            value={newInvestment.amount}
-            onChange={handleChange}
-            placeholder="Investment Amount"
-            required
-          />
-          <input
-            type="date"
-            name="date"
-            value={newInvestment.date}
-            onChange={handleChange}
-            required
-          />
-          <button type="submit">Save Investment</button>
-        </form>
+      {showAddInvestment && (
+        <InvestmentDetails
+          investment={newInvestment}
+          onClose={handleCloseAddInvestment}
+          onUpdateInvestment={handleAddInvestment}
+        />
       )}
 
       <ul>
@@ -96,25 +96,12 @@ const FinanceList = () => {
         ))}
       </ul>
 
-      {reviewId && (
-        <div>
-          <h3>Review Investment</h3>
-          <input
-            type="number"
-            placeholder="Updated Amount"
-            value={updatedValue}
-            onChange={(e) => setUpdatedValue(e.target.value)}
-            required
-          />
-          <input
-            type="date"
-            value={updatedDate}
-            onChange={(e) => setUpdatedDate(e.target.value)}
-            required
-          />
-          <button onClick={() => handleUpdate(reviewId)}>Update Investment</button>
-          <button onClick={() => setReviewId(null)}>Cancel</button>
-        </div>
+      {selectedInvestment && (
+        <InvestmentDetails
+          investment={selectedInvestment}
+          onClose={handleCloseDetails}
+          onUpdateInvestment={handleUpdateInvestment}
+        />
       )}
     </div>
   );

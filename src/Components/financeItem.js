@@ -1,25 +1,20 @@
-// src/Components/financeItem.js
-
 import React from 'react';
-
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(amount);
-};
+import formatCurrency from './formatCurrency';
+import formatDate from './formatDate';
+import '../App.css';
 
 const FinanceItem = ({ investment }) => {
+  const latestValue = investment.finalValue || investment.amount;
+
   return (
-    <li>
+    <li className="finance-item">
       <strong>{investment.name}</strong> - 
-      Original Value: {formatCurrency(investment.amount)} 
-      {investment.updatedAmount && (
-        <> (Updated Value: <strong>{formatCurrency(investment.updatedAmount)}</strong>) </>
-      )} 
-      on {investment.date}
-      <button onClick={() => investment.onDelete(investment.id)}>Delete</button>
-      <button onClick={() => investment.onReview(investment.id)}>Review</button>
+      Latest Value: <strong>{formatCurrency(latestValue)}</strong>
+      &nbsp;on {formatDate(investment.date)}
+      <div>
+        <button onClick={() => investment.onDelete(investment.id)}>Delete</button>
+        <button onClick={() => investment.onReview(investment.id)}>Review</button>
+      </div>
     </li>
   );
 };

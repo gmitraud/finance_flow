@@ -49,10 +49,14 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
         <h2>{investment.name ? investment.name + ' Details' : 'Add New Investment'}</h2>
         {investment.name && (
           <>
-            <p>Original Amount: {formatCurrency(investment.amount)}</p>
             <h3>History:</h3>
             <ul>
-              {investment.history.map((entry, index) => (
+              <li>
+                Original Amount: {formatCurrency(investment.amount)}
+              </li>
+              {investment.history
+              .sort((a, b) => new Date(a.date) - new Date(b.date))
+              .map((entry, index) => (
                 <li key={index}>
                   Value: {formatCurrency(entry.value)} on {formatDate(entry.date)}
                 </li>
@@ -66,7 +70,7 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
               }}>
                 {formatCurrency(finalValue)}
                 &nbsp;
-                ({finalValue > investment.amount ? '+' : ''}{(finalValue - investment.amount).toFixed(2)})
+                ({finalValue > investment.amount ? '+' : ''}{formatCurrency((finalValue - investment.amount).toFixed(2))})
               </span>
             </h3>
 
@@ -77,8 +81,8 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
         <input
           type="text"
           placeholder="Investment Name"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
+          value={investment.name}
+          disabled
         />
 
         <input

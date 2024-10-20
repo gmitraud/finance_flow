@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import FinanceItem from './financeItem';
 import InvestmentDetails from './InvestmentDetails';
-import UserManagement from './Admin';
 
 const FinanceList = ({ userRole }) => {
   const [investments, setInvestments] = useState([]);
@@ -74,7 +73,7 @@ const FinanceList = ({ userRole }) => {
   };
 
   const handleOpenAddInvestment = () => {
-    setShowAddInvestment(true); // Agora qualquer usuário pode adicionar investimentos
+    setShowAddInvestment(true);
     setNewInvestment({ name: '', amount: '', date: '' });
   };
 
@@ -84,12 +83,8 @@ const FinanceList = ({ userRole }) => {
 
   return (
     <div>
-      <UserManagement onCreateUser={(newUser) => {
-        alert(`User created: ${newUser.username} with role: ${newUser.role}`);
-      }} />
       <h2>My Investments</h2>
 
-      {/* Remover restrição para ADMIN aqui */}
       <button onClick={handleOpenAddInvestment}>Add Investment</button>
 
       {showAddInvestment && (

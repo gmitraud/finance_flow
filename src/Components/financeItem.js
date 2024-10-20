@@ -4,18 +4,25 @@ import formatDate from './formatDate';
 import '../App.css';
 
 const FinanceItem = ({ investment }) => {
-  const { id, name, finalValue, lastUpdateDate, onDelete, onReview } = investment;
+  // Calculando finalValue e lastUpdateDate dentro do componente
+  const finalValue = investment.history && investment.history.length > 0
+    ? investment.history[investment.history.length - 1].value
+    : investment.amount || 0; // Garantindo que seja um número
+
+  const lastUpdateDate = investment.history && investment.history.length > 0
+    ? investment.history[investment.history.length - 1].date
+    : investment.date; // Usando a data do investimento se não houver histórico
 
   return (
     <li>
       <div>
-        <h3>{name}</h3>
+        <h3>{investment.name}</h3>
         <p>
-          Latest Value: {formatCurrency(finalValue)} on {formatDate(lastUpdateDate)}
+          Latest Value: {formatCurrency(finalValue)} on {formatDate(lastUpdateDate || new Date())}
         </p>
       </div>
-      <button onClick={() => onReview(id)}>Review</button>
-      <button onClick={() => onDelete(id)}>Delete</button>
+      <button onClick={() => investment.onReview(investment.id)}>Review</button>
+      <button onClick={() => investment.onDelete(investment.id)}>Delete</button>
     </li>
   );
 };

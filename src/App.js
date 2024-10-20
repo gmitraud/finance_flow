@@ -3,12 +3,14 @@ import './App.css';
 import FinanceList from './Components/financeList';
 import Login from './Components/Login';
 import Header from './Components/Header';
+import UserManagement from './Components/Admin';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
+  const [showUserManagement, setShowUserManagement] = useState(false);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -64,7 +66,7 @@ function App() {
         <h1>Finance Flow</h1>
         {user ? (
           <>
-            <Header user={user} onLogout={handleLogout} />
+            <Header user={user} onLogout={handleLogout} handleCreateUser={() => setShowUserManagement(true)} />
             {user.role === 'ADMIN' && <p>Admin privileges enabled</p>}
             <FinanceList userRole={user.role} />
 
@@ -74,7 +76,6 @@ function App() {
                 <button onClick={() => setShowUsers(!showUsers)}>
                   {showUsers ? 'Hide Users' : 'Show Users'}
                 </button>
-                <button onClick={handleCreateUser}>Create User</button>
 
                 {showUsers && (
                   <ul>
@@ -86,6 +87,14 @@ function App() {
                   </ul>
                 )}
               </div>
+            )}
+
+            {showUserManagement && (
+              <UserManagement
+                onCreateUser={handleCreateUser}
+                onClose={() => setShowUserManagement(false)}
+                user={user}
+              />
             )}
           </>
         ) : (

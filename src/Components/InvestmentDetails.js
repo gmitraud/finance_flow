@@ -3,12 +3,12 @@ import '../App.css';
 import formatCurrency from './formatCurrency';
 import formatDate from './formatDate';
 
-const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
-  const [newName, setNewName] = useState(investment.name || ''); 
+const InvestmentDetails = ({ investment, onClose, onUpdateInvestment, isReviewMode }) => {
+  const [newName, setNewName] = useState(investment.name || '');
   const [newAmount, setNewAmount] = useState(investment.amount || '');
   const [newDate, setNewDate] = useState(investment.date || '');
-  const [showErrorModal, setShowErrorModal] = useState(false); // controls error msg box
-  const [errorMessage, setErrorMessage] = useState(''); // Defines error msg
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleUpdate = () => {
     if (!newName || !newAmount || !newDate) {
@@ -52,7 +52,7 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
             <h3>History:</h3>
             <ul>
               <li>
-                Original Amount: {formatCurrency(investment.amount)}
+                Original Amount: {formatCurrency(investment.amount)} on {formatDate(investment.date)}
               </li>
               {investment.history
               .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -81,8 +81,9 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment }) => {
         <input
           type="text"
           placeholder="Investment Name"
-          value={investment.name}
-          disabled
+          value={isReviewMode ? investment.name : newName}
+          onChange={isReviewMode ? undefined : (e) => setNewName(e.target.value)} // Desabilita o onChange no modo de revisão
+          disabled={isReviewMode} // Desabilita o campo se estiver em modo de revisão
         />
 
         <input

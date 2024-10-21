@@ -4,14 +4,14 @@ import formatDate from './formatDate';
 import '../App.css';
 
 const FinanceItem = ({ investment }) => {
-  // Calculando finalValue e lastUpdateDate dentro do componente
+
   const finalValue = investment.history && investment.history.length > 0
     ? investment.history[investment.history.length - 1].value
-    : investment.amount || 0; // Garantindo que seja um número
+    : investment.amount || 0;
 
   const lastUpdateDate = investment.history && investment.history.length > 0
     ? investment.history[investment.history.length - 1].date
-    : investment.date; // Usando a data do investimento se não houver histórico
+    : investment.date;
 
   return (
     <li>

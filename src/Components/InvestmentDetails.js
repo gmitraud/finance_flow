@@ -82,8 +82,8 @@ const InvestmentDetails = ({ investment, onClose, onUpdateInvestment, isReviewMo
           type="text"
           placeholder="Investment Name"
           value={isReviewMode ? investment.name : newName}
-          onChange={isReviewMode ? undefined : (e) => setNewName(e.target.value)} // Desabilita o onChange no modo de revisão
-          disabled={isReviewMode} // Desabilita o campo se estiver em modo de revisão
+          onChange={isReviewMode ? undefined : (e) => setNewName(e.target.value)}
+          disabled={isReviewMode}
         />
 
         <input

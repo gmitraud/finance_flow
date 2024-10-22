@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import '../App.css';
+import ConfirmationModal from './ConfirmationModal';
 
 const UserManagement = ({ onCreateUser, onClose }) => {
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('USER');
   const [newStatus, setNewStatus] = useState('ATIVO');
+  const [modalMessage, setModalMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleCreateUser = () => {
     if (!newUsername || !newPassword) {
-      alert('Please enter a username and password');
+      setModalMessage('Please enter a username and password');
+      setShowModal(true);
+      return;
+    }
+
+    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const isUsernameTaken = existingUsers.some(user => user.username === newUsername);
+
+    if (isUsernameTaken) {
+      setModalMessage('Username already exists. Please choose another one.');
+      setShowModal(true);
       return;
     }
 
@@ -48,6 +61,14 @@ const UserManagement = ({ onCreateUser, onClose }) => {
         </select>
         <button onClick={handleCreateUser}>Create User</button>
         <button onClick={onClose}>Close</button>
+
+        {showModal && (
+          <ConfirmationModal
+            message={modalMessage}
+            isConfirmation={false}
+            onClose={() => setShowModal(false)}
+          />
+        )}
       </div>
     </div>
   );

@@ -17,6 +17,8 @@ function App() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [actionToConfirm, setActionToConfirm] = useState(null);
   const [userToActOn, setUserToActOn] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const [investments, setInvestments] = useState([]);
 
   useEffect(() => {
@@ -47,7 +49,8 @@ function App() {
       (u) => u.username === userData.username && u.status === 'ATIVO'
     );
     if (!activeUser) {
-      alert('Your account is inactive, please contact an administrator');
+      setAlertMessage('Your account is inactive, please contact an administrator');
+      setShowAlert(true);
       return;
     }
     setUser(userData);
@@ -64,7 +67,9 @@ function App() {
     const updatedUsers = [...users, userWithStatus];
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
-    alert(`User ${userWithStatus.username} created with role ${userWithStatus.role}`);
+    
+    setAlertMessage(`User ${userWithStatus.username} created with role ${userWithStatus.role}`);
+    setShowAlert(true);
   };
 
   const confirmAction = (action, user) => {
@@ -161,6 +166,14 @@ function App() {
                 message={`Are you sure you want to ${actionToConfirm} the user ${userToActOn.username}?`}
                 onConfirm={executeConfirmedAction}
                 onCancel={cancelAction}
+              />
+            )}
+
+            {showAlert && (
+              <ConfirmationModal
+                message={alertMessage}
+                onClose={() => setShowAlert(false)}
+                isConfirmation={false}
               />
             )}
           </>

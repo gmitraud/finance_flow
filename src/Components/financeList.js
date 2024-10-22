@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import FinanceItem from './financeItem';
 import InvestmentDetails from './InvestmentDetails';
+import ConfirmationModal from './ConfirmationModal';
 
 const FinanceList = ({ userRole, username }) => {
   const [investments, setInvestments] = useState([]);
   const [selectedInvestment, setSelectedInvestment] = useState(null);
   const [newInvestment, setNewInvestment] = useState({ name: '', amount: '', date: '' });
   const [showAddInvestment, setShowAddInvestment] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [investmentToDelete, setInvestmentToDelete] = useState(null);
 
   useEffect(() => {
     const savedInvestments = JSON.parse(localStorage.getItem(`investments_${username}`)) || [];
@@ -18,16 +21,21 @@ const FinanceList = ({ userRole, username }) => {
     localStorage.setItem(`investments_${username}`, JSON.stringify(newInvestments));
   };
 
-  const handleDelete = (id) => {
-    if (userRole !== 'ADMIN') {
-      alert('Only ADMIN can delete investments');
-      return;
-    }
+  const confirmDelete = (id) => {
+    const investment = investments.find((inv) => inv.id === id);
+    setInvestmentToDelete(investment);
+    setShowConfirmation(true);
+  };
 
-    if (window.confirm('Are you sure you want to delete this investment?')) {
-      const updatedInvestments = investments.filter((investment) => investment.id !== id);
-      saveInvestments(updatedInvestments);
-    }
+  const handleDeleteConfirmed = () => {
+    const updatedInvestments = investments.filter((investment) => investment.id !== investmentToDelete.id);
+    saveInvestments(updatedInvestments);
+    setShowConfirmation(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmation(false);
+    setInvestmentToDelete(null);
   };
 
   const handleReview = (id) => {
@@ -101,7 +109,11 @@ const FinanceList = ({ userRole, username }) => {
         {investments.map((investment) => (
           <FinanceItem
             key={investment.id}
-            investment={{ ...investment, onDelete: handleDelete, onReview: handleReview }}
+            investment={{
+              ...investment,
+              onDelete: () => confirmDelete(investment.id),
+              onReview: handleReview,
+            }}
           />
         ))}
       </ul>
@@ -112,6 +124,14 @@ const FinanceList = ({ userRole, username }) => {
           onClose={handleCloseDetails}
           onUpdateInvestment={handleUpdateInvestment}
           isReviewMode={true}
+        />
+      )}
+
+      {showConfirmation && (
+        <ConfirmationModal
+          message={`Are you sure you want to delete the investment "${investmentToDelete.name}"?`}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={handleCancelDelete}
         />
       )}
     </div>

@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
+import ConfirmationModal from './ConfirmationModal';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleLogin = () => {
-    if (username === 'admin' && password === 'admin123') {
-      onLogin({ role: 'ADMIN', username });
-    } else if (username === 'user' && password === 'user123') {
-      onLogin({ role: 'USER', username });
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    const foundUser = users.find(
+      (user) => user.username === username && user.password === password
+    );
+
+    if (foundUser) {
+      if (foundUser.status !== 'ATIVO') {
+        setModalMessage('Your account is inactive, please contact an administrator.');
+        setShowModal(true);
+        return;
+      }
+      onLogin(foundUser);
     } else {
-      alert('Invalid credentials');
+      setModalMessage('Invalid credentials');
+      setShowModal(true);
     }
   };
 
@@ -32,6 +45,14 @@ const Login = ({ onLogin }) => {
       <div>
         <button onClick={handleLogin}>Login</button>
       </div>
+
+      {showModal && (
+        <ConfirmationModal
+          message={modalMessage}
+          isConfirmation={false}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

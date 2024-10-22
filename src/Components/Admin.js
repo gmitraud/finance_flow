@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../App.css';
 
-const UserManagement = ({ onCreateUser, onClose, user }) => {
+const UserManagement = ({ onCreateUser, onClose }) => {
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('USER');
   const [newStatus, setNewStatus] = useState('ATIVO');
-
-  useEffect(() => {
-    if (user.role !== 'ADMIN') {
-      alert('Access denied: Only ADMIN users can create new users.');
-      onClose();
-    }
-  }, [user, onClose]);
 
   const handleCreateUser = () => {
     if (!newUsername || !newPassword) {

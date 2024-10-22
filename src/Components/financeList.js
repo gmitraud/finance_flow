@@ -63,7 +63,7 @@ const FinanceList = ({ userRole, username }) => {
   const handleAddInvestment = (newInvestment) => {
     const investmentToAdd = {
       ...newInvestment,
-      id: investments.length + 1,
+      id: investments.length > 0 ? investments[investments.length - 1].id + 1 : 1,
       history: [],
       amount: parseFloat(newInvestment.amount) || 0,
       date: newInvestment.date || new Date().toISOString().split('T')[0],

@@ -4,6 +4,8 @@ import FinanceList from './Components/financeList';
 import Login from './Components/Login';
 import Header from './Components/Header';
 import UserManagement from './Components/Admin';
+import ReviewUserModal from './Components/ReviewUserModal';
+import ConfirmationModal from './Components/ConfirmationModal';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
@@ -11,6 +13,11 @@ function App() {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [actionToConfirm, setActionToConfirm] = useState(null);
+  const [userToActOn, setUserToActOn] = useState(null);
+  const [investments, setInvestments] = useState([]);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -60,6 +67,37 @@ function App() {
     alert(`User ${userWithStatus.username} created with role ${userWithStatus.role}`);
   };
 
+  const confirmAction = (action, user) => {
+    setActionToConfirm(action);
+    setUserToActOn(user);
+    setShowConfirmation(true);
+  };
+
+  const handleDeleteUser = (username) => {
+    const updatedUsers = users.filter((u) => u.username !== username);
+    setUsers(updatedUsers);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+  };
+
+  const handleReviewUser = (userToReview) => {
+    setSelectedUser(userToReview);
+  };
+
+  const executeConfirmedAction = () => {
+    if (actionToConfirm === 'delete') {
+      handleDeleteUser(userToActOn.username);
+    } else if (actionToConfirm === 'review') {
+      handleReviewUser(userToActOn);
+    }
+    setShowConfirmation(false);
+    setUserToActOn(null);
+  };
+
+  const cancelAction = () => {
+    setShowConfirmation(false);
+    setUserToActOn(null);
+  };
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -68,7 +106,13 @@ function App() {
           <>
             <Header user={user} onLogout={handleLogout} handleCreateUser={() => setShowUserManagement(true)} />
             {user.role === 'ADMIN' && <p>Admin privileges enabled</p>}
-            <FinanceList userRole={user.role} />
+            
+            <FinanceList 
+              userRole={user.role} 
+              username={user.username} 
+              investments={investments}
+              setInvestments={setInvestments}
+            />
 
             {user.role === 'ADMIN' && users.length > 0 && (
               <div>
@@ -82,6 +126,12 @@ function App() {
                     {users.map((u, index) => (
                       <li key={index}>
                         {u.username} - {u.role} - {u.status}
+                        <button onClick={() => confirmAction('delete', u)} style={{ marginLeft: '10px' }}>
+                          Delete
+                        </button>
+                        <button onClick={() => confirmAction('review', u)} style={{ marginLeft: '10px' }}>
+                          Review
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -94,6 +144,23 @@ function App() {
                 onCreateUser={handleCreateUser}
                 onClose={() => setShowUserManagement(false)}
                 user={user}
+              />
+            )}
+
+            {selectedUser && (
+              <ReviewUserModal
+                user={selectedUser}
+                onClose={() => setSelectedUser(null)}
+                setUsers={setUsers}
+                users={users}
+              />
+            )}
+
+            {showConfirmation && (
+              <ConfirmationModal
+                message={`Are you sure you want to ${actionToConfirm} the user ${userToActOn.username}?`}
+                onConfirm={executeConfirmedAction}
+                onCancel={cancelAction}
               />
             )}
           </>

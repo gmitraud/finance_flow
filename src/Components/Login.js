@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ConfirmationModal from './ConfirmationModal';
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, theme, toggleTheme }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [modalMessage, setModalMessage] = useState('');
@@ -27,20 +27,37 @@ const Login = ({ onLogin }) => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <div>
+      <header>
+        {/* Botão de alternância de tema */}
+        <button 
+          onClick={toggleTheme} 
+          className="theme-toggle-button"
+        >
+          {theme === 'light' ? <i className="fas fa-moon"></i> : <i className="fas fa-sun"></i>}
+        </button>
+      </header>
       <h2>Login</h2>
       <input
         type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <div>
         <button onClick={handleLogin}>Login</button>

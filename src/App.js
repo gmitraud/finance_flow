@@ -9,6 +9,7 @@ import ConfirmationModal from './Components/ConfirmationModal';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
+  const [theme, setTheme] = useState('light'); // Estado para controlar o tema
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
@@ -22,6 +23,10 @@ function App() {
   const [investments, setInvestments] = useState([]);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('appTheme') || 'light'; // Recupera o tema salvo
+    setTheme(savedTheme); // Define o tema salvo (se existir)
+    document.body.className = savedTheme; // Aplica a classe do tema ao body
+
     const savedUser = JSON.parse(localStorage.getItem('loggedInUser'));
     const allUsers = JSON.parse(localStorage.getItem('users')) || [];
 
@@ -43,6 +48,14 @@ function App() {
       setUsers(allUsers);
     }
   }, []);
+
+  // Alternar entre os temas
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light'; // Alterna entre "light" e "dark"
+    setTheme(newTheme);
+    localStorage.setItem('appTheme', newTheme); // Salva o tema no localStorage
+    document.body.className = newTheme; // Aplica a classe do tema ao body
+  };
 
   const handleLogin = (userData) => {
     const activeUser = users.find(
@@ -105,12 +118,18 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="App">
+      <div className={`App ${theme}`}> {/* Aplica a classe correspondente ao tema */}
         <h1>Finance Flow</h1>
         {user ? (
           <>
-            <Header user={user} onLogout={handleLogout} handleCreateUser={() => setShowUserManagement(true)} />
-            {user.role === 'ADMIN' && <p>Admin privileges enabled</p>}
+            <Header 
+              user={user} 
+              onLogout={handleLogout} 
+              handleCreateUser={() => setShowUserManagement(true)} 
+              theme={theme} // Passa o estado do tema para o Header
+              toggleTheme={toggleTheme} // Passa a função de alternância de tema para o Header
+            />
+            {user.role === 'ADMIN' && <p className="admin-privileges">Admin privileges enabled</p>}
             
             <FinanceList 
               userRole={user.role} 
@@ -178,7 +197,7 @@ function App() {
             )}
           </>
         ) : (
-          <Login onLogin={handleLogin} />
+          <Login onLogin={handleLogin} theme={theme} toggleTheme={toggleTheme} />
         )}
       </div>
     </BrowserRouter>
